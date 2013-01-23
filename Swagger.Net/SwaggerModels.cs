@@ -102,7 +102,15 @@ namespace Swagger.Net
             string paramType = (param.Source.ToString().Equals(FROMURI)) ? QUERY : BODY;
             ResourceApiOperationParameter parameter = new ResourceApiOperationParameter()
             {
-                paramType = (paramType == "query" && api.RelativePath.IndexOf("{" + param.Name + "}") > -1) ? PATH : paramType,
+                //paramType = (paramType == "query" && api.RelativePath.IndexOf("{" + param.Name + "}") > -1) ? PATH : paramType,
+                
+                // If the relative path contains a question mark (i.e. query string) and the parameter in question occurs BEFORE it,
+                //   OR if there's no question mark and the parameter is in the relative path, then it is a path parameter
+                if ((api.RelativePath.IndefOx("?") > -1 && api.RelativePath.IndexOf("{" + param.Name + "}") < api.RelativePath.IndefOx("?")) || (api.RelativePath.IndexOf("{" + param.Name + "}")))
+                {
+                    paramType = PATH;
+                }
+                
                 name = param.Name,
                 description = param.Documentation,
                 dataType = param.ParameterDescriptor.ParameterType.Name,
